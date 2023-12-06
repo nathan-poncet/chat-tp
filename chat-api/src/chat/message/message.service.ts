@@ -20,7 +20,10 @@ export class MessageService {
         (message) => message.id === newMessage.id,
       );
       if (index !== -1) {
-        this.messages[index] = newMessage;
+        this.messages[index] = {
+          ...newMessage,
+          updatedAt: new Date().toISOString(),
+        };
       }
     }
   }

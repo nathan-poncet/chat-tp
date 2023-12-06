@@ -14,6 +14,6 @@ export enum LanguageCode {
 }
 
 export type Translation = {
-  language_code: LanguageCode;
+  languageCode: LanguageCode;
   content: string;
 };

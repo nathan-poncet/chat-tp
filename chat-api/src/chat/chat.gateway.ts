@@ -4,29 +4,24 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
-import { Message } from 'types/message';
-import OpenAI from 'openai';
+import { Message, MessageVerificationStatus } from 'types/message';
 import { LanguageCode } from 'types/translation';
 import { MessageService } from './message/message.service';
-import { TranslationService } from './translation/translation.service';
 import { UserService } from './user/user.service';
+import { TranslationService } from './translation/translation.service';
+import { VerificationService } from './verification/verification.service';
 
 @WebSocketGateway({ cors: true })
 export class ChatGateway {
   @WebSocketServer()
   server: Socket;
 
-  openai: OpenAI;
-
   constructor(
     private readonly userService: UserService,
     private readonly messageService: MessageService,
     private readonly translationService: TranslationService,
-  ) {
-    this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-  }
+    private readonly verificationService: VerificationService,
+  ) {}
 
   @SubscribeMessage('chat-message')
   handleMessage(client: Socket, payload: string) {
@@ -39,6 +34,7 @@ export class ChatGateway {
       content: payload,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      verificationStatus: MessageVerificationStatus.UNVERIFIED,
     };
 
     this.messageService.addMessages([newMessage]);
@@ -47,7 +43,7 @@ export class ChatGateway {
   }
 
   @SubscribeMessage('chat-messages-translates')
-  async handleMessageTranslate(
+  async handleMessagesTranslates(
     client: Socket,
     payload: { messages: Message[]; languages: LanguageCode[] },
   ) {
@@ -65,6 +61,29 @@ export class ChatGateway {
     } catch (error) {
       this.server.to(client.id).emit('chat-messages-translates', {
         error: 'Failed to translate message',
+      });
+    }
+  }
+
+  @SubscribeMessage('chat-messages-verifications')
+  async handleMessagesVerifications(
+    client: Socket,
+    payload: { messages: Message[] },
+  ) {
+    const { messages } = payload;
+
+    try {
+      const messagesVerified =
+        await this.verificationService.verifyMessagesInformation(messages);
+
+      this.messageService.updateMessages(messagesVerified);
+
+      this.server.emit('chat-messages-translates', {
+        data: messagesVerified,
+      });
+    } catch (error) {
+      this.server.to(client.id).emit('chat-messages-translates', {
+        error: 'Failed to verify messages',
       });
     }
   }

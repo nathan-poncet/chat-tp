@@ -8,6 +8,9 @@ import { User } from "@/types/user";
 import { Dispatch, SetStateAction, createContext, useState } from "react";
 import { Socket, io } from "socket.io-client";
 import ChatTranslator from "@/components/chat/translator";
+import ChatVerificator from "@/components/chat/verificator";
+import { LanguageCode } from "@/types/translation";
+import ChatLanguagesSelector from "@/components/chat/languages_selector";
 
 export const ChatContext = createContext<{
   user: User | null;
@@ -18,6 +21,8 @@ export const ChatContext = createContext<{
   setMessages: Dispatch<SetStateAction<Message[]>>;
   selectedMessages: Message[];
   setSelectedMessages: Dispatch<SetStateAction<Message[]>>;
+  selectedLanguages: LanguageCode[];
+  setSelectedLanguages: Dispatch<SetStateAction<LanguageCode[]>>;
   translationLoading: boolean;
   setTranslationLoading: Dispatch<SetStateAction<boolean>>;
 }>({
@@ -29,6 +34,8 @@ export const ChatContext = createContext<{
   setMessages: () => {},
   selectedMessages: [],
   setSelectedMessages: () => {},
+  selectedLanguages: [],
+  setSelectedLanguages: () => {},
   translationLoading: false,
   setTranslationLoading: () => {},
 });
@@ -40,6 +47,9 @@ export default function Chat() {
   const [users, setUsers] = useState<User[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [selectedMessages, setSelectedMessages] = useState<Message[]>([]);
+  const [selectedLanguages, setSelectedLanguages] = useState<LanguageCode[]>(
+    []
+  );
   const [translationLoading, setTranslationLoading] = useState<boolean>(false);
 
   const connect_to_chat = (username: string) => {
@@ -78,6 +88,8 @@ export default function Chat() {
         setMessages,
         selectedMessages,
         setSelectedMessages,
+        selectedLanguages,
+        setSelectedLanguages,
         translationLoading,
         setTranslationLoading,
       }}
@@ -110,10 +122,19 @@ export default function Chat() {
         ) : (
           <div className="flex flex-row h-full w-full overflow-x-hidden p-6 gap-6">
             <ChatUsers />
-            <div className="flex flex-col flex-auto h-full space-y-2">
-              <ChatTranslator />
-              <div className="flex flex-col flex-auto flex-shrink-0 rounded-2xl bg-gray-100 p-4">
-                <ChatMessages />
+            <div className="flex flex-col flex-auto flex-shrink-0 rounded-2xl bg-gray-100 p-4">
+              <ChatMessages />
+              <div className="relative flex justify-center">
+                <div className="absolute bottom-full py-4">
+                  <div className="spacer-y-2">
+                    <div className="flex justify-center gap-4">
+                      <ChatVerificator />
+                      <div className="w-px bg-gray-300"></div>
+                      <ChatTranslator />
+                    </div>
+                    <ChatLanguagesSelector />
+                  </div>
+                </div>
                 <ChatForm />
               </div>
             </div>

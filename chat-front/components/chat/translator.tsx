@@ -1,28 +1,20 @@
 import { ChatContext } from "@/app/chat/page";
 import { LanguageCode } from "@/types/translation";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 export default function ChatTranslator({}: {}) {
   const {
     selectedMessages,
     setSelectedMessages,
+    selectedLanguages,
+    setSelectedLanguages,
     socket,
-    translationLoading,
-    setTranslationLoading,
   } = useContext(ChatContext);
-  const [selectedLanguages, setSelectedLanguages] = useState<LanguageCode[]>(
-    []
-  );
 
-  if (selectedMessages.length == 0 && translationLoading == false) return null;
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const handleLanguageClick = (language: LanguageCode) => {
-    setSelectedLanguages((prevLanguages) => {
-      if (prevLanguages.includes(language)) {
-        return prevLanguages.filter((prevLanguage) => prevLanguage != language);
-      } else return [...prevLanguages, language];
-    });
-  };
+  const disabled =
+    selectedMessages.length == 0 || selectedLanguages.length == 0 || loading;
 
   const handleButtonClick = () => {
     socket?.emit("chat-messages-translates", {
@@ -30,48 +22,32 @@ export default function ChatTranslator({}: {}) {
       languages: selectedLanguages,
     });
 
+    setLoading(true);
+
     setSelectedMessages([]);
     setSelectedLanguages([]);
 
-    setTranslationLoading(true);
+    setLoading(true);
   };
 
+  useEffect(() => {
+    socket?.on("chat-messages-translates", (_) => {
+      setLoading(false);
+    });
+
+    // Clean up
+    return () => {
+      socket?.off("chat-messages-translates");
+    };
+  }, [socket]);
+
   return (
-    <div
-      className={`flex justify-between rounded-2xl p-4 gap-4 ${
-        translationLoading ? "bg-indigo-500" : "bg-gray-100"
-      }`}
+    <button
+      className={`bg-indigo-500 disabled:bg-indigo-300 px-4 py-2 rounded-2xl text-white text-lg`}
+      onClick={handleButtonClick}
+      disabled={disabled}
     >
-      {translationLoading ? (
-        <p className="text-white">Translation Loading...</p>
-      ) : (
-        <>
-          <div className="flex flex-wrap rounded-2xl bg-gray-100 p-4 gap-2">
-            {Object.values(LanguageCode).map((language) => (
-              <button
-                key={language}
-                className={`border border-indigo-500 px-2 rounded-2xl ${
-                  selectedLanguages.some(
-                    (selectedLanguage) => selectedLanguage == language
-                  )
-                    ? "bg-indigo-500 text-white"
-                    : ""
-                }`}
-                onClick={() => handleLanguageClick(language)}
-              >
-                {language}
-              </button>
-            ))}
-          </div>
-          <button
-            className="flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-400 rounded-xl text-white px-4 py-1 flex-shrink-0"
-            onClick={handleButtonClick}
-            disabled={selectedLanguages.length == 0}
-          >
-            Translate
-          </button>
-        </>
-      )}
-    </div>
+      {loading ? "Loading..." : "Translate"}
+    </button>
   );
 }
