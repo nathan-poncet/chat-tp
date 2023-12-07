@@ -1,12 +1,12 @@
 "use client";
 
-import { ChatContext } from "@/app/chat/page";
 import { useContext, useState } from "react";
 import {
   Message,
   MessageType,
   MessageVerificationStatus,
 } from "@/types/message";
+import { ChatContext } from "@/libs/contexts/ChatContext";
 
 export default function Message({ message }: { message: Message }) {
   const { user, selectedMessages, setSelectedMessages } =

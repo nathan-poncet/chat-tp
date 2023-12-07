@@ -1,4 +1,4 @@
-import { ChatContext } from "@/app/chat/page";
+import { ChatContext } from "@/libs/contexts/ChatContext";
 import { LanguageCode } from "@/types/translation";
 import { useContext } from "react";
 

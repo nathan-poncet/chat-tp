@@ -2,7 +2,7 @@
 
 import { Message } from "@/types/message";
 import { User } from "@/types/user";
-import { Dispatch, SetStateAction, createContext, useState } from "react";
+import { useState } from "react";
 import { Socket, io } from "socket.io-client";
 import Users from "@/components/chat/Users";
 import Form from "@/components/chat/Form";
@@ -12,30 +12,7 @@ import Verificator from "@/components/chat/Verificator";
 import { LanguageCode } from "@/types/translation";
 import LanguagesSelector from "@/components/chat/LanguagesSelector";
 import Suggestor from "@/components/chat/Suggestor";
-
-export const ChatContext = createContext<{
-  user: User | null;
-  socket: Socket | null;
-  users: User[];
-  setUsers: Dispatch<SetStateAction<User[]>>;
-  messages: Message[];
-  setMessages: Dispatch<SetStateAction<Message[]>>;
-  selectedMessages: Message[];
-  setSelectedMessages: Dispatch<SetStateAction<Message[]>>;
-  selectedLanguages: LanguageCode[];
-  setSelectedLanguages: Dispatch<SetStateAction<LanguageCode[]>>;
-}>({
-  user: null,
-  socket: null,
-  users: [],
-  setUsers: () => {},
-  messages: [],
-  setMessages: () => {},
-  selectedMessages: [],
-  setSelectedMessages: () => {},
-  selectedLanguages: [],
-  setSelectedLanguages: () => {},
-});
+import { ChatContext } from "@/libs/contexts/ChatContext";
 
 export default function Chat() {
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -49,7 +26,9 @@ export default function Chat() {
   );
 
   const connect_to_chat = (username: string) => {
-    const socket = io("http://localhost:3000", { query: { username } });
+    const socket = io(process.env.NEXT_PUBLIC_SERVER_URL ?? "", {
+      query: { username },
+    });
     setSocket(socket);
 
     socket.once("response", ({ data: { users, messages }, error: error }) => {

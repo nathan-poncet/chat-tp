@@ -1,7 +1,7 @@
-import { ChatContext } from "@/app/chat/page";
 import { useContext, useEffect, useRef } from "react";
 import { Message } from "@/types/message";
 import ChatMessage from "@/components/chat/Message";
+import { ChatContext } from "@/libs/contexts/ChatContext";
 
 export default function Messages() {
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -79,7 +79,10 @@ export default function Messages() {
   }, [messages]);
 
   return (
-    <div ref={chatContainerRef} className="flex flex-col h-full overflow-y-auto mb-4">
+    <div
+      ref={chatContainerRef}
+      className="flex flex-col h-full overflow-y-auto mb-4"
+    >
       <div className="flex flex-col h-full">
         <div className="grid grid-cols-12 gap-y-2 pb-20">
           {messages.map((message, _) =>

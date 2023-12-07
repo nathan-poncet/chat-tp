@@ -1,4 +1,5 @@
-import { ChatContext } from "@/app/chat/page";
+
+import { ChatContext } from "@/libs/contexts/ChatContext";
 import { useContext, useEffect } from "react";
 
 export default function Users() {

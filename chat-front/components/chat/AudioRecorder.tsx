@@ -1,5 +1,4 @@
 import { useVoiceRecorder } from "@/libs/hooks/useVoiceRecorder";
-import { useState } from "react";
 
 export default function AudioRecorder({
   record,

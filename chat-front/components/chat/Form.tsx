@@ -1,6 +1,6 @@
-import { ChatContext } from "@/app/chat/page";
 import { useContext, useEffect, useState } from "react";
 import AudioRecorder from "./AudioRecorder";
+import { ChatContext } from "@/libs/contexts/ChatContext";
 
 export default function Form() {
   const { socket } = useContext(ChatContext);
@@ -27,13 +27,16 @@ export default function Form() {
   const disabled = currentMessage.length == 0 && record == undefined;
 
   useEffect(() => {
-    socket?.on("chat-message-suggestion", ({data: suggestion, error: error}) => {
-      if (error) {
-        alert(error);
-        return;
+    socket?.on(
+      "chat-message-suggestion",
+      ({ data: suggestion, error: error }) => {
+        if (error) {
+          alert(error);
+          return;
+        }
+        setCurrentMessage(suggestion);
       }
-      setCurrentMessage(suggestion);
-    });
+    );
 
     // Clean up
     return () => {

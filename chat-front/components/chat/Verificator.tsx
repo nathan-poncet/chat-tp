@@ -1,4 +1,4 @@
-import { ChatContext } from "@/app/chat/page";
+import { ChatContext } from "@/libs/contexts/ChatContext";
 import { useContext, useEffect, useState } from "react";
 
 export default function Verificator() {
