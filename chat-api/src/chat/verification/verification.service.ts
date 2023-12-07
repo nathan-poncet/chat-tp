@@ -7,8 +7,6 @@ export class VerificationService {
   constructor(private readonly openai: OpenAI) {}
 
   async verifyMessagesInformation(messages: Message[]): Promise<Message[]> {
-    console.log(messages);
-
     const prompt = `
       You are a message verifier with access to information.
       
@@ -110,8 +108,6 @@ export class VerificationService {
       verificationStatus: message.verificationStatus,
     }));
 
-    console.log(formatedMessages);
-
     const response = await this.openai.chat.completions.create({
       model: 'gpt-3.5-turbo-1106',
       response_format: { type: 'json_object' },
@@ -130,8 +126,6 @@ export class VerificationService {
     const messagesVerified = JSON.parse(
       response.choices[0].message.content,
     ).messages;
-
-    console.log(messagesVerified);
 
     // merge the translations with the original messages
     return messages.map((message) => {
