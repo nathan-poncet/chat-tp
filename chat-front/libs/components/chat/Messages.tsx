@@ -1,9 +1,9 @@
 import { ChatContext } from "@/app/chat/page";
 import { useContext, useEffect } from "react";
-import ChatMessage from "./message";
 import { Message } from "@/types/message";
+import ChatMessage from "@/libs/components/chat/Message";
 
-export default function ChatMessages() {
+export default function Messages() {
   const { socket, user, messages, setMessages, setTranslationLoading } =
     useContext(ChatContext);
 

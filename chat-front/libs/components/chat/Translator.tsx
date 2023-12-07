@@ -1,8 +1,7 @@
 import { ChatContext } from "@/app/chat/page";
-import { LanguageCode } from "@/types/translation";
 import { useContext, useEffect, useState } from "react";
 
-export default function ChatTranslator({}: {}) {
+export default function Translator({}: {}) {
   const {
     selectedMessages,
     setSelectedMessages,

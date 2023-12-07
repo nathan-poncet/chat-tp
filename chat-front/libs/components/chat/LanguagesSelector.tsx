@@ -2,7 +2,7 @@ import { ChatContext } from "@/app/chat/page";
 import { LanguageCode } from "@/types/translation";
 import { useContext } from "react";
 
-export default function ChatLanguagesSelector() {
+export default function LanguagesSelector() {
   const { selectedMessages, selectedLanguages, setSelectedLanguages, socket } =
     useContext(ChatContext);
 

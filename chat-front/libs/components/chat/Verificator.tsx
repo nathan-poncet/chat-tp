@@ -1,7 +1,7 @@
 import { ChatContext } from "@/app/chat/page";
 import { useContext, useEffect, useState } from "react";
 
-export default function ChatVerificator() {
+export default function Verificator() {
   const { selectedMessages, setSelectedMessages, socket } =
     useContext(ChatContext);
 

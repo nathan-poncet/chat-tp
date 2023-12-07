@@ -1,16 +1,16 @@
 "use client";
 
-import ChatUsers from "@/components/chat/users";
-import ChatForm from "@/components/chat/form";
-import ChatMessages from "@/components/chat/messages";
 import { Message } from "@/types/message";
 import { User } from "@/types/user";
 import { Dispatch, SetStateAction, createContext, useState } from "react";
 import { Socket, io } from "socket.io-client";
-import ChatTranslator from "@/components/chat/translator";
-import ChatVerificator from "@/components/chat/verificator";
+import ChatUsers from "@/libs/components/chat/Users";
+import ChatForm from "@/libs/components/chat/Form";
+import ChatMessages from "@/libs/components/chat/Messages";
+import ChatTranslator from "@/libs/components/chat/Translator";
+import ChatVerificator from "@/libs/components/chat/Verificator";
 import { LanguageCode } from "@/types/translation";
-import ChatLanguagesSelector from "@/components/chat/languages_selector";
+import ChatLanguagesSelector from "@/libs/components/chat/LanguagesSelector";
 
 export const ChatContext = createContext<{
   user: User | null;

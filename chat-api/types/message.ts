@@ -7,8 +7,14 @@ export enum MessageVerificationStatus {
   UNVERIFIED = 'UNVERIFIED',
 }
 
+export enum MessageType {
+  TEXT = 'TEXT',
+  AUDIO = 'AUDIO',
+}
+
 export type Message = {
   id: string;
+  type: MessageType;
   user: User;
   translations: Translation[];
   content: string;

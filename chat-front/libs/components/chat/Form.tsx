@@ -1,10 +1,12 @@
 import { ChatContext } from "@/app/chat/page";
 import { useContext, useState } from "react";
 
-export default function ChatForm() {
+export default function Form() {
   const { socket } = useContext(ChatContext);
   const [currentMessage, setCurrentMessage] = useState<string>("");
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    console.log("submit");
+    
     e.preventDefault();
     socket?.emit("chat-message", currentMessage);
     setCurrentMessage("");

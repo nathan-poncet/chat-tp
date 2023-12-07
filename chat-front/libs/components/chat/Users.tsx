@@ -1,7 +1,7 @@
 import { ChatContext } from "@/app/chat/page";
 import { useContext, useEffect } from "react";
 
-export default function ChatUsers() {
+export default function Users() {
   const { socket, users, setUsers } = useContext(ChatContext);
 
   useEffect(() => {

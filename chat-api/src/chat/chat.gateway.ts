@@ -4,7 +4,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
-import { Message, MessageVerificationStatus } from 'types/message';
+import { Message, MessageType, MessageVerificationStatus } from 'types/message';
 import { LanguageCode } from 'types/translation';
 import { MessageService } from './message/message.service';
 import { UserService } from './user/user.service';
@@ -29,6 +29,7 @@ export class ChatGateway {
 
     const newMessage: Message = {
       id: Math.random().toString(36).substr(2, 9),
+      type: MessageType.TEXT,
       user,
       translations: [],
       content: payload,
@@ -86,6 +87,26 @@ export class ChatGateway {
         error: 'Failed to verify messages',
       });
     }
+  }
+
+  @SubscribeMessage('chat-message')
+  handleAudio(client: Socket, payload: string) {
+    const user = this.userService.getUserByClientId(client.id);
+
+    const newMessage: Message = {
+      id: Math.random().toString(36).substr(2, 9),
+      type: MessageType.TEXT,
+      user,
+      translations: [],
+      content: payload,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      verificationStatus: MessageVerificationStatus.UNVERIFIED,
+    };
+
+    this.messageService.addMessages([newMessage]);
+
+    this.server.emit('chat-message', newMessage);
   }
 
   handleConnection(client: Socket) {
