@@ -1,19 +1,24 @@
 import { Injectable } from '@nestjs/common';
-import OpenAI from 'openai';
+import { OpenAIService } from 'src/openai/openai.service';
 import { Message } from 'types/message';
 
 @Injectable()
 export class VerificationService {
-  constructor(private readonly openai: OpenAI) {}
+  constructor(private readonly openaiService: OpenAIService) {}
 
   async verifyMessagesInformation(messages: Message[]): Promise<Message[]> {
     const prompt = `
-      You are a message verifier with access to information.
+      You are a chat message verifier with access to information.
       
       A user has provided you with a list of messages that need to be verified.
       Your goal is to determine if the information in each message is accurate.
       
       You should review each message and provide a verification result for each one.
+      You have to be very careful about who send the message and the context of the conversation.
+      If you see that some messages is linked to a previous message, you should take that into account.
+
+      Moreover, you should provide a reason for each verification result.
+      The reason should be a short sentence that explain why the message is accurate or not and it should be in the message language.
 
       Here are the types you need to be aware of:
 
@@ -50,8 +55,9 @@ export class VerificationService {
             "clientId": "1",
             "username": "John Doe"
           },
-          "content": "Hello world!",
-          "verificationStatus": "UNVERIFIED"
+          "content": "Earth is flat!",
+          "verificationStatus": "UNVERIFIED",
+          "createdAt": "2021-10-01T00:00:00.000Z",
         },
         {
           "id": "2",
@@ -59,8 +65,9 @@ export class VerificationService {
             "clientId": "2",
             "username": "Jane Doe"
           },
-          "content": "Hello world!",
-          "verificationStatus": "UNVERIFIED"
+          "content": "No it's a sphere!",
+          "verificationStatus": "UNVERIFIED",
+          "createdAt": "2021-10-02T00:00:00.000Z",
         },
         {
           "id": "3",
@@ -68,8 +75,9 @@ export class VerificationService {
             "clientId": "3",
             "username": "John Doe"
           },
-          "content": "Hello world!",
-          "verificationStatus": "UNVERIFIED"
+          "content": "No i'm sure it's flat!",
+          "verificationStatus": "UNVERIFIED",
+          "createdAt": "2021-10-03T00:00:00.000Z",
         }
       ]
 
@@ -82,15 +90,18 @@ export class VerificationService {
       "messages": [
         {
           "id": "1",
-          "verificationStatus": "VERIFIED"
+          "verificationStatus": "REJECTED",
+          "reason": "The Earth is a sphere, not flat!"
         },
         {
           "id": "2",
-          "verificationStatus": "REJECTED"
+          "verificationStatus": "VERIFIED",
+          "reason": "The Earth is a sphere!"
         },
         {
           "id": "3",
-          "verificationStatus": "VERIFIED"
+          "verificationStatus": "REJECTED",
+          "reason": "The Earth is a sphere, not flat!"
         }
       ]
 
@@ -106,26 +117,19 @@ export class VerificationService {
       user: message.user,
       content: message.content,
       verificationStatus: message.verificationStatus,
+      createdAt: message.createdAt,
     }));
 
-    const response = await this.openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-1106',
-      response_format: { type: 'json_object' },
-      messages: [
-        {
-          role: 'system',
-          content: prompt,
-        },
-        {
-          role: 'user',
-          content: JSON.stringify({ messages: formatedMessages }),
-        },
-      ],
+    const sortedMessages = formatedMessages.sort((a, b) => {
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
     });
 
-    const messagesVerified = JSON.parse(
-      response.choices[0].message.content,
-    ).messages;
+    const response = await this.openaiService.chatCompletionsJSON(
+      prompt,
+      JSON.stringify({ messages: sortedMessages }),
+    );
+
+    const messagesVerified = JSON.parse(response).messages;
 
     // merge the translations with the original messages
     return messages.map((message) => {
@@ -135,6 +139,7 @@ export class VerificationService {
 
       if (messageVerified) {
         message.verificationStatus = messageVerified.verificationStatus;
+        message.reason = messageVerified.reason;
       } else {
         throw 'Missing some verifications';
       }

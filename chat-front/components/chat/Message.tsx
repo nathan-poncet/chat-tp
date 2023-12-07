@@ -68,7 +68,21 @@ export default function Message({ message }: { message: Message }) {
           onClick={handleClick}
         >
           {/* Verification status */}
-          <div className="absolute top-0 left-0 -translate-x-1/4 -translate-y-1/4 text-xs ">
+          <div
+            className={`group absolute top-0 text-xs ${
+              user.username == message.user.username
+                ? "left-0 -translate-x-1/4 -translate-y-1/4"
+                : "right-0 translate-x-1/4 -translate-y-1/4"
+            }`}
+          >
+            <span
+              className={`absolute bottom-full  w-40 group-hover:opacity-100 transition-opacity bg-gray-800 px-2 py-1 text-sm text-left text-gray-100 rounded-md opacity-0 ${
+                user.username == message.user.username ? "right-full" : "left-full"
+              }`}
+            >
+              {message.reason}
+            </span>
+
             {message.verificationStatus ==
               MessageVerificationStatus.VERIFIED && (
               <span className="inline-flex items-center justify-center w-6 h-6 text-sm font-semibold bg-green-100 border border-gray-200 rounded-full text-green-500">

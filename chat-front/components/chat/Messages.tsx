@@ -1,9 +1,10 @@
 import { ChatContext } from "@/app/chat/page";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { Message } from "@/types/message";
 import ChatMessage from "@/components/chat/Message";
 
 export default function Messages() {
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const { socket, user, messages, setMessages } = useContext(ChatContext);
 
   useEffect(() => {
@@ -70,10 +71,17 @@ export default function Messages() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    console.log("messages", messages);
+    if (chatContainerRef.current == null) return;
+    console.log("messages", messages);
+    chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+  }, [messages]);
+
   return (
-    <div className="flex flex-col h-full overflow-x-auto mb-4">
+    <div ref={chatContainerRef} className="flex flex-col h-full overflow-y-auto mb-4">
       <div className="flex flex-col h-full">
-        <div className="grid grid-cols-12 gap-y-2">
+        <div className="grid grid-cols-12 gap-y-2 pb-20">
           {messages.map((message, _) =>
             user != null ? (
               <ChatMessage

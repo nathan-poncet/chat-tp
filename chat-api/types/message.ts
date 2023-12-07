@@ -22,6 +22,7 @@ export type Message =
       createdAt: string;
       updatedAt: string;
       verificationStatus: MessageVerificationStatus;
+      reason: string;
     }
   | {
       id: string;
@@ -33,4 +34,5 @@ export type Message =
       createdAt: string;
       updatedAt: string;
       verificationStatus: MessageVerificationStatus;
+      reason: string;
     };

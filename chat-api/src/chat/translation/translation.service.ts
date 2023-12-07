@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import OpenAI from 'openai';
+import { OpenAIService } from 'src/openai/openai.service';
 import { Message } from 'types/message';
 import { LanguageCode } from 'types/translation';
 
 @Injectable()
 export class TranslationService {
-  constructor(private readonly openai: OpenAI) {}
+  constructor(private readonly openaiService: OpenAIService) {}
 
   async translateMessages(
     messages: Message[],
@@ -70,24 +70,12 @@ export class TranslationService {
       };
     });
 
-    const response = await this.openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-1106',
-      response_format: { type: 'json_object' },
-      messages: [
-        {
-          role: 'system',
-          content: prompt,
-        },
-        {
-          role: 'user',
-          content: JSON.stringify({ messages: formatedMessages, languages }),
-        },
-      ],
-    });
+    const response = await this.openaiService.chatCompletionsJSON(
+      prompt,
+      JSON.stringify({ messages: formatedMessages, languages }),
+    );
 
-    const messagesTranslated: Message[] = JSON.parse(
-      response.choices[0].message.content,
-    ).messages;
+    const messagesTranslated: Message[] = JSON.parse(response).messages;
 
     // Is there a missing translation?
     const missingTranslations = messagesTranslated.some((message) => {

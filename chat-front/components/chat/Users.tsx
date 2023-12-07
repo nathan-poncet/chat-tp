@@ -24,7 +24,7 @@ export default function Users() {
           {users?.length}
         </span>
       </div>
-      <div className="flex flex-col space-y-1 mt-4 overflow-y-auto">
+      <div className="flex flex-row md:flex-col space-y-1 mt-4 overflow-y-auto">
         {users?.map((user) => (
           <button
             key={user.clientId}

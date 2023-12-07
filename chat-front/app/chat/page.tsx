@@ -113,9 +113,9 @@ export default function Chat() {
             </form>
           </div>
         ) : (
-          <div className="flex flex-row h-full w-full overflow-x-hidden p-6 gap-6">
+          <div className="flex flex-col md:flex-row h-full w-full overflow-x-hidden p-6 gap-6">
             <Users />
-            <div className="flex flex-col flex-auto flex-shrink-0 rounded-2xl bg-gray-100 p-4">
+            <div className="flex flex-col h-full w-full rounded-2xl bg-gray-100 p-4 overflow-hidden">
               <Messages />
               <div className="relative flex justify-center">
                 <div className="absolute bottom-full py-4">

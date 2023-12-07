@@ -1,6 +1,7 @@
 import { Module, Global } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
+import { OpenAIService } from './openai.service';
 
 @Global()
 @Module({
@@ -15,7 +16,8 @@ import OpenAI from 'openai';
       },
       inject: [ConfigService],
     },
+    OpenAIService,
   ],
-  exports: [OpenAI],
+  exports: [OpenAI, OpenAIService],
 })
 export class OpenAIModule {}

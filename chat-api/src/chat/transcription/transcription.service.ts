@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import OpenAI from 'openai';
 import {
   createReadStream,
   existsSync,
@@ -8,10 +7,11 @@ import {
   writeFileSync,
 } from 'fs';
 import { join } from 'path';
+import { OpenAIService } from 'src/openai/openai.service';
 
 @Injectable()
 export class TranscriptionService {
-  constructor(private readonly openai: OpenAI) {}
+  constructor(private readonly openaiService: OpenAIService) {}
 
   async transcriptAudio(audioBuffer: Buffer): Promise<{
     buffer: Buffer;
@@ -26,18 +26,15 @@ export class TranscriptionService {
 
     writeFileSync(audioFilePath, audioBuffer);
 
-    const response = await this.openai.audio.transcriptions
-      .create({
-        model: 'whisper-1',
-        file: createReadStream(audioFilePath),
-      })
+    const response = await this.openaiService
+      .audioTranscriptions(createReadStream(audioFilePath))
       .finally(() => {
         unlinkSync(audioFilePath);
       });
 
     return {
       buffer: audioBuffer,
-      content: response.text,
+      content: response,
     };
   }
 }

@@ -41,6 +41,7 @@ export class ChatGateway {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         verificationStatus: MessageVerificationStatus.UNVERIFIED,
+        reason: '',
       };
 
       this.messageService.addMessages([newMessage]);
@@ -68,6 +69,7 @@ export class ChatGateway {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       verificationStatus: MessageVerificationStatus.UNVERIFIED,
+      reason: '',
     };
 
     this.messageService.addMessages([newMessage]);
@@ -82,9 +84,16 @@ export class ChatGateway {
   ) {
     const { messages, languages } = payload;
 
+    const sortedMessages = messages.sort((a, b) => {
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    });
+
     try {
       const messagesTranslated =
-        await this.translationService.translateMessages(messages, languages);
+        await this.translationService.translateMessages(
+          sortedMessages,
+          languages,
+        );
 
       this.messageService.updateMessages(messagesTranslated);
 
