@@ -79,11 +79,11 @@ export class ChatGateway {
 
       this.messageService.updateMessages(messagesVerified);
 
-      this.server.emit('chat-messages-translates', {
+      this.server.emit('chat-messages-verifications', {
         data: messagesVerified,
       });
     } catch (error) {
-      this.server.to(client.id).emit('chat-messages-translates', {
+      this.server.to(client.id).emit('chat-messages-verifications', {
         error: 'Failed to verify messages',
       });
     }

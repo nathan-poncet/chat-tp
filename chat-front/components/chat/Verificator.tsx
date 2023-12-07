@@ -36,7 +36,7 @@ export default function Verificator() {
       onClick={handleButtonClick}
       disabled={disabled}
     >
-      Verify
+      {loading ? "Loading..." : "Verify"}
     </button>
   );
 }

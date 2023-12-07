@@ -1,7 +1,7 @@
 import { ChatContext } from "@/app/chat/page";
 import { useContext, useEffect } from "react";
 import { Message } from "@/types/message";
-import ChatMessage from "@/libs/components/chat/Message";
+import ChatMessage from "@/components/chat/Message";
 
 export default function Messages() {
   const { socket, user, messages, setMessages, setTranslationLoading } =
@@ -15,6 +15,26 @@ export default function Messages() {
 
     socket?.on(
       "chat-messages-translates",
+      ({ data: messages, error }: { data: Message[]; error: any }) => {
+        setTranslationLoading(false);
+
+        if (error) {
+          alert(error);
+          return;
+        }
+
+        setMessages((prevMessages) =>
+          prevMessages.map(
+            (prevMessage) =>
+              messages.find((message) => message.id == prevMessage.id) ??
+              prevMessage
+          )
+        );
+      }
+    );
+
+    socket?.on(
+      "chat-messages-verifications",
       ({ data: messages, error }: { data: Message[]; error: any }) => {
         setTranslationLoading(false);
 
