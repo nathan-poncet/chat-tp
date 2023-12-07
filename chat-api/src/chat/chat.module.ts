@@ -5,6 +5,7 @@ import { MessageModule } from './message/message.module';
 import { TranslationModule } from './translation/translation.module';
 import { VerificationModule } from './verification/verification.module';
 import { TranscriptionModule } from './transcription/transcription.module';
+import { SuggestionModule } from './suggestion/suggestion.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { TranscriptionModule } from './transcription/transcription.module';
     MessageModule,
     VerificationModule,
     TranscriptionModule,
+    SuggestionModule,
   ],
   providers: [ChatGateway],
 })

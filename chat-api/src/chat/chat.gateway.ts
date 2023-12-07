@@ -11,6 +11,7 @@ import { UserService } from './user/user.service';
 import { TranslationService } from './translation/translation.service';
 import { VerificationService } from './verification/verification.service';
 import { TranscriptionService } from './transcription/transcription.service';
+import { SuggestionService } from './suggestion/suggestion.service';
 
 @WebSocketGateway({ cors: true, maxHttpBufferSize: 1e8 })
 export class ChatGateway {
@@ -23,6 +24,7 @@ export class ChatGateway {
     private readonly translationService: TranslationService,
     private readonly verificationService: VerificationService,
     private readonly transcriptionService: TranscriptionService,
+    private readonly suggestionService: SuggestionService,
   ) {}
 
   @SubscribeMessage('chat-audio')
@@ -48,8 +50,6 @@ export class ChatGateway {
 
       this.server.emit('chat-audio', { data: newMessage });
     } catch (error) {
-      console.error(error);
-
       this.server.to(client.id).emit('chat-audio', {
         error: 'Failed to transcript audio',
       });
@@ -75,6 +75,27 @@ export class ChatGateway {
     this.messageService.addMessages([newMessage]);
 
     this.server.emit('chat-message', newMessage);
+  }
+
+  @SubscribeMessage('chat-message-suggestion')
+  async handleMessageSuggestion(client: Socket) {
+    const user = this.userService.getUserByClientId(client.id);
+    const messages = this.messageService.getAllMessages();
+
+    try {
+      const suggestion = await this.suggestionService.suggestMessage(
+        messages,
+        user,
+      );
+
+      this.server
+        .to(client.id)
+        .emit('chat-message-suggestion', { data: suggestion });
+    } catch (error) {
+      this.server.to(client.id).emit('chat-message-suggestion', {
+        error: 'Failed to suggest message',
+      });
+    }
   }
 
   @SubscribeMessage('chat-messages-translates')

@@ -120,9 +120,10 @@ export class VerificationService {
       createdAt: message.createdAt,
     }));
 
-    const sortedMessages = formatedMessages.sort((a, b) => {
-      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-    });
+    const sortedMessages = formatedMessages.sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+    );
 
     const response = await this.openaiService.chatCompletionsJSON(
       prompt,

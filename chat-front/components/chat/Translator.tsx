@@ -42,7 +42,7 @@ export default function Translator({}: {}) {
 
   return (
     <button
-      className={`bg-indigo-500 disabled:bg-indigo-300 px-4 py-2 rounded-2xl text-white text-lg`}
+      className={`bg-indigo-500 disabled:bg-indigo-300 px-2 py-1 rounded-2xl text-white text-lg`}
       onClick={handleButtonClick}
       disabled={disabled}
     >

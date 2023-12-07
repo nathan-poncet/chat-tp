@@ -11,6 +11,7 @@ import Translator from "@/components/chat/Translator";
 import Verificator from "@/components/chat/Verificator";
 import { LanguageCode } from "@/types/translation";
 import LanguagesSelector from "@/components/chat/LanguagesSelector";
+import Suggestor from "@/components/chat/Suggestor";
 
 export const ChatContext = createContext<{
   user: User | null;
@@ -124,6 +125,8 @@ export default function Chat() {
                       <Verificator />
                       <div className="w-px bg-gray-300"></div>
                       <Translator />
+                      <div className="w-px bg-gray-300"></div>
+                      <Suggestor />
                     </div>
                     <LanguagesSelector />
                   </div>

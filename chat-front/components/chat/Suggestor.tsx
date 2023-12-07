@@ -1,32 +1,26 @@
 import { ChatContext } from "@/app/chat/page";
 import { useContext, useEffect, useState } from "react";
 
-export default function Verificator() {
-  const { selectedMessages, setSelectedMessages, socket } =
-    useContext(ChatContext);
-
+export default function Suggestor() {
+  const { socket } = useContext(ChatContext);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const disabled = selectedMessages.length == 0;
+  const disabled = loading;
 
   const handleClick = () => {
-    socket?.emit("chat-messages-verifications", {
-      messages: selectedMessages,
-    });
+    socket?.emit("chat-message-suggestion");
 
     setLoading(true);
-
-    setSelectedMessages([]);
   };
 
   useEffect(() => {
-    socket?.on("chat-messages-verifications", (_) => {
+    socket?.on("chat-message-suggestion", (_) => {
       setLoading(false);
     });
 
     // Clean up
     return () => {
-      socket?.off("chat-messages-verifications");
+      socket?.off("chat-message-suggestion");
     };
   }, [socket]);
 
@@ -36,7 +30,7 @@ export default function Verificator() {
       onClick={handleClick}
       disabled={disabled}
     >
-      {loading ? "Loading..." : "Verify"}
+      {loading ? "Loading..." : "Suggest me a message"}
     </button>
   );
 }
