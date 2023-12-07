@@ -63,6 +63,7 @@ export default function Messages() {
     // Clean up
     return () => {
       socket?.off("chat-message");
+      socket?.off("chat-audio");
       socket?.off("chat-messages-translates");
       socket?.off("chat-messages-verifications");
     };

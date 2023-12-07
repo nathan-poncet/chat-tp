@@ -12,7 +12,7 @@ import { TranslationService } from './translation/translation.service';
 import { VerificationService } from './verification/verification.service';
 import { TranscriptionService } from './transcription/transcription.service';
 
-@WebSocketGateway({ cors: true })
+@WebSocketGateway({ cors: true, maxHttpBufferSize: 1e8 })
 export class ChatGateway {
   @WebSocketServer()
   server: Socket;
