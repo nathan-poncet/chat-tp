@@ -2,7 +2,11 @@
 
 import { ChatContext } from "@/app/chat/page";
 import { useContext, useState } from "react";
-import { Message, MessageVerificationStatus } from "@/types/message";
+import {
+  Message,
+  MessageType,
+  MessageVerificationStatus,
+} from "@/types/message";
 
 export default function Message({ message }: { message: Message }) {
   const { user, selectedMessages, setSelectedMessages } =
@@ -29,6 +33,16 @@ export default function Message({ message }: { message: Message }) {
 
   if (user == null) return null;
 
+  function arrayBufferToDataUri(buffer: Buffer) {
+    const byteArray = new Uint8Array(buffer);
+    let binaryString = "";
+    for (let i = 0; i < byteArray.byteLength; i++) {
+      binaryString += String.fromCharCode(byteArray[i]);
+    }
+    const base64Data = btoa(binaryString);
+    return "data:audio/wav;base64," + base64Data; // Change the MIME type accordingly
+  }
+
   return (
     <div
       className={
@@ -48,7 +62,7 @@ export default function Message({ message }: { message: Message }) {
           {message.user.username}
         </div>
         <div
-          className={`relative text-sm bg-white py-2 px-4 shadow rounded-xl border 
+          className={`relative text-sm bg-white py-2 px-4 shadow rounded-xl border
           ${messageIsSelected ? "border-indigo-500" : ""} 
           ${user.username == message.user.username ? "text-right" : ""}`}
           onClick={handleClick}
@@ -93,6 +107,15 @@ export default function Message({ message }: { message: Message }) {
               </span>
             )}
           </div>
+
+          {/* Audio */}
+          {message.type === MessageType.AUDIO && (
+            <audio
+              src={arrayBufferToDataUri(message.buffer)}
+              controls
+              className="w-25 mb-2"
+            />
+          )}
 
           {/* Display Content */}
           <div>{message.content}</div>

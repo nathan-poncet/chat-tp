@@ -4,8 +4,7 @@ import { Message } from "@/types/message";
 import ChatMessage from "@/components/chat/Message";
 
 export default function Messages() {
-  const { socket, user, messages, setMessages, setTranslationLoading } =
-    useContext(ChatContext);
+  const { socket, user, messages, setMessages } = useContext(ChatContext);
 
   useEffect(() => {
     // Listen for incoming messages
@@ -14,10 +13,20 @@ export default function Messages() {
     });
 
     socket?.on(
+      "chat-audio",
+      ({ data: message, error }: { data: Message; error: any }) => {
+        if (error) {
+          alert(error);
+          return;
+        }
+
+        setMessages((prevMessages) => [...prevMessages, message]);
+      }
+    );
+
+    socket?.on(
       "chat-messages-translates",
       ({ data: messages, error }: { data: Message[]; error: any }) => {
-        setTranslationLoading(false);
-
         if (error) {
           alert(error);
           return;
@@ -36,8 +45,6 @@ export default function Messages() {
     socket?.on(
       "chat-messages-verifications",
       ({ data: messages, error }: { data: Message[]; error: any }) => {
-        setTranslationLoading(false);
-
         if (error) {
           alert(error);
           return;
@@ -57,6 +64,7 @@ export default function Messages() {
     return () => {
       socket?.off("chat-message");
       socket?.off("chat-messages-translates");
+      socket?.off("chat-messages-verifications");
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

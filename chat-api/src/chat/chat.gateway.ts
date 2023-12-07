@@ -10,6 +10,7 @@ import { MessageService } from './message/message.service';
 import { UserService } from './user/user.service';
 import { TranslationService } from './translation/translation.service';
 import { VerificationService } from './verification/verification.service';
+import { TranscriptionService } from './transcription/transcription.service';
 
 @WebSocketGateway({ cors: true })
 export class ChatGateway {
@@ -21,7 +22,38 @@ export class ChatGateway {
     private readonly messageService: MessageService,
     private readonly translationService: TranslationService,
     private readonly verificationService: VerificationService,
+    private readonly transcriptionService: TranscriptionService,
   ) {}
+
+  @SubscribeMessage('chat-audio')
+  async handleAudio(client: Socket, audio: Buffer) {
+    try {
+      const { buffer, content } =
+        await this.transcriptionService.transcriptAudio(audio);
+
+      const newMessage: Message = {
+        id: Math.random().toString(36).substr(2, 9),
+        type: MessageType.AUDIO,
+        user: this.userService.getUserByClientId(client.id),
+        translations: [],
+        buffer,
+        content,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        verificationStatus: MessageVerificationStatus.UNVERIFIED,
+      };
+
+      this.messageService.addMessages([newMessage]);
+
+      this.server.emit('chat-audio', { data: newMessage });
+    } catch (error) {
+      console.error(error);
+
+      this.server.to(client.id).emit('chat-audio', {
+        error: 'Failed to transcript audio',
+      });
+    }
+  }
 
   @SubscribeMessage('chat-message')
   handleMessage(client: Socket, payload: string) {
@@ -87,26 +119,6 @@ export class ChatGateway {
         error: 'Failed to verify messages',
       });
     }
-  }
-
-  @SubscribeMessage('chat-message')
-  handleAudio(client: Socket, payload: string) {
-    const user = this.userService.getUserByClientId(client.id);
-
-    const newMessage: Message = {
-      id: Math.random().toString(36).substr(2, 9),
-      type: MessageType.TEXT,
-      user,
-      translations: [],
-      content: payload,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      verificationStatus: MessageVerificationStatus.UNVERIFIED,
-    };
-
-    this.messageService.addMessages([newMessage]);
-
-    this.server.emit('chat-message', newMessage);
   }
 
   handleConnection(client: Socket) {

@@ -12,13 +12,25 @@ export enum MessageType {
   AUDIO = 'AUDIO',
 }
 
-export type Message = {
-  id: string;
-  type: MessageType;
-  user: User;
-  translations: Translation[];
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-  verificationStatus: MessageVerificationStatus;
-};
+export type Message =
+  | {
+      id: string;
+      type: MessageType.TEXT;
+      user: User;
+      translations: Translation[];
+      content: string;
+      createdAt: string;
+      updatedAt: string;
+      verificationStatus: MessageVerificationStatus;
+    }
+  | {
+      id: string;
+      type: MessageType.AUDIO;
+      user: User;
+      translations: Translation[];
+      buffer: Buffer;
+      content: string;
+      createdAt: string;
+      updatedAt: string;
+      verificationStatus: MessageVerificationStatus;
+    };

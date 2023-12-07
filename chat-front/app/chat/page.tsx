@@ -4,13 +4,13 @@ import { Message } from "@/types/message";
 import { User } from "@/types/user";
 import { Dispatch, SetStateAction, createContext, useState } from "react";
 import { Socket, io } from "socket.io-client";
-import ChatUsers from "@/components/chat/Users";
-import ChatForm from "@/components/chat/Form";
-import ChatMessages from "@/components/chat/Messages";
-import ChatTranslator from "@/components/chat/Translator";
-import ChatVerificator from "@/components/chat/Verificator";
+import Users from "@/components/chat/Users";
+import Form from "@/components/chat/Form";
+import Messages from "@/components/chat/Messages";
+import Translator from "@/components/chat/Translator";
+import Verificator from "@/components/chat/Verificator";
 import { LanguageCode } from "@/types/translation";
-import ChatLanguagesSelector from "@/components/chat/LanguagesSelector";
+import LanguagesSelector from "@/components/chat/LanguagesSelector";
 
 export const ChatContext = createContext<{
   user: User | null;
@@ -23,8 +23,6 @@ export const ChatContext = createContext<{
   setSelectedMessages: Dispatch<SetStateAction<Message[]>>;
   selectedLanguages: LanguageCode[];
   setSelectedLanguages: Dispatch<SetStateAction<LanguageCode[]>>;
-  translationLoading: boolean;
-  setTranslationLoading: Dispatch<SetStateAction<boolean>>;
 }>({
   user: null,
   socket: null,
@@ -36,8 +34,6 @@ export const ChatContext = createContext<{
   setSelectedMessages: () => {},
   selectedLanguages: [],
   setSelectedLanguages: () => {},
-  translationLoading: false,
-  setTranslationLoading: () => {},
 });
 
 export default function Chat() {
@@ -50,7 +46,6 @@ export default function Chat() {
   const [selectedLanguages, setSelectedLanguages] = useState<LanguageCode[]>(
     []
   );
-  const [translationLoading, setTranslationLoading] = useState<boolean>(false);
 
   const connect_to_chat = (username: string) => {
     const socket = io("http://localhost:3000", { query: { username } });
@@ -90,8 +85,6 @@ export default function Chat() {
         setSelectedMessages,
         selectedLanguages,
         setSelectedLanguages,
-        translationLoading,
-        setTranslationLoading,
       }}
     >
       <div className="flex h-screen antialiased text-gray-800">
@@ -121,21 +114,21 @@ export default function Chat() {
           </div>
         ) : (
           <div className="flex flex-row h-full w-full overflow-x-hidden p-6 gap-6">
-            <ChatUsers />
+            <Users />
             <div className="flex flex-col flex-auto flex-shrink-0 rounded-2xl bg-gray-100 p-4">
-              <ChatMessages />
+              <Messages />
               <div className="relative flex justify-center">
                 <div className="absolute bottom-full py-4">
                   <div className="spacer-y-2">
                     <div className="flex justify-center gap-4">
-                      <ChatVerificator />
+                      <Verificator />
                       <div className="w-px bg-gray-300"></div>
-                      <ChatTranslator />
+                      <Translator />
                     </div>
-                    <ChatLanguagesSelector />
+                    <LanguagesSelector />
                   </div>
                 </div>
-                <ChatForm />
+                <Form />
               </div>
             </div>
           </div>

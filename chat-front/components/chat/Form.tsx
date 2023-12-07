@@ -1,14 +1,30 @@
 import { ChatContext } from "@/app/chat/page";
 import { useContext, useState } from "react";
+import AudioRecorder from "./AudioRecorder";
 
 export default function Form() {
   const { socket } = useContext(ChatContext);
   const [currentMessage, setCurrentMessage] = useState<string>("");
+  const [record, setRecord] = useState<Blob>();
+
+  const recordSrc = record ? window.URL.createObjectURL(record) : undefined;
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (record) {
+      socket?.emit("chat-audio", record, (status: any) => {
+        console.log(status);
+      });
+      setRecord(undefined);
+      return;
+    }
+
     socket?.emit("chat-message", currentMessage);
     setCurrentMessage("");
   };
+
+  const disabled = currentMessage.length == 0 && record == undefined;
 
   return (
     <form
@@ -33,37 +49,49 @@ export default function Form() {
           </svg>
         </button>
       </div>
-      <div className="flex-grow ml-4">
-        <div className="relative w-full">
-          <input
-            type="text"
-            value={currentMessage}
-            onChange={(e) => setCurrentMessage(e.target.value)}
-            className="flex w-full border rounded-xl focus:outline-none focus:border-indigo-300 pl-4 h-10"
+      <div className="flex-1 ml-4">
+        {record ? (
+          <audio
+            src={recordSrc}
+            controls
+            preload={"metadata"}
+            className="w-full"
           />
-          <button className="absolute flex items-center justify-center h-full w-12 right-0 top-0 text-gray-400 hover:text-gray-600">
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              ></path>
-            </svg>
-          </button>
-        </div>
+        ) : (
+          <div className="relative w-full">
+            <input
+              type="text"
+              value={currentMessage}
+              onChange={(e) => setCurrentMessage(e.target.value)}
+              className="flex w-full border rounded-xl focus:outline-none focus:border-indigo-300 pl-4 h-10"
+            />
+            <button className="absolute flex items-center justify-center h-full w-12 right-0 top-0 text-gray-400 hover:text-gray-600">
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        )}
+      </div>
+      <div className="ml-4">
+        <AudioRecorder record={record} setRecord={setRecord} />
       </div>
       <div className="ml-4">
         <button
           className="flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-400 rounded-xl text-white px-4 py-1 flex-shrink-0"
           type="submit"
-          disabled={currentMessage.length == 0}
+          disabled={disabled}
         >
           <span>Send</span>
           <span className="ml-2">

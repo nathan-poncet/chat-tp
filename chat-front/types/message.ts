@@ -7,12 +7,30 @@ export enum MessageVerificationStatus {
   UNVERIFIED = 'UNVERIFIED',
 }
 
-export type Message = {
-  id: string;
-  user: User;
-  translations: Translation[];
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-  verificationStatus: MessageVerificationStatus;
-};
+export enum MessageType {
+  TEXT = 'TEXT',
+  AUDIO = 'AUDIO',
+}
+
+export type Message =
+  | {
+      id: string;
+      type: MessageType.TEXT;
+      user: User;
+      translations: Translation[];
+      content: string;
+      createdAt: string;
+      updatedAt: string;
+      verificationStatus: MessageVerificationStatus;
+    }
+  | {
+      id: string;
+      type: MessageType.AUDIO;
+      user: User;
+      translations: Translation[];
+      buffer: Buffer;
+      content: string;
+      createdAt: string;
+      updatedAt: string;
+      verificationStatus: MessageVerificationStatus;
+    };

@@ -9,7 +9,7 @@ export default function Verificator() {
 
   const disabled = selectedMessages.length == 0;
 
-  const handleButtonClick = () => {
+  const handleClick = () => {
     socket?.emit("chat-messages-verifications", {
       messages: selectedMessages,
     });
@@ -33,7 +33,7 @@ export default function Verificator() {
   return (
     <button
       className={`bg-indigo-500 disabled:bg-indigo-300 px-4 py-2 rounded-2xl text-white text-lg`}
-      onClick={handleButtonClick}
+      onClick={handleClick}
       disabled={disabled}
     >
       {loading ? "Loading..." : "Verify"}
